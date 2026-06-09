@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AnimeAll — AI Powered</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#04060d;--bg2:#080c18;--card:#0d1225;--card2:#111830;
+  --accent:#e63946;--accent2:#ff6b35;--gold:#ffd60a;
+  --text:#f1f5f9;--muted:#7b8db0;--border:#1a2540;
+  --glow:0 0 40px rgba(230,57,70,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent),var(--accent2));border-radius:3px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.2rem;height:58px;
+  background:rgba(4,6,13,.96);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.search-bar{display:flex;align-items:center;gap:.5rem;
+  background:var(--card);border:1px solid var(--border);border-radius:30px;
+  padding:.4rem 1rem;flex:1;max-width:260px;margin:0 1rem;transition:all .25s;}
+.search-bar:focus-within{border-color:var(--accent);}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:.85rem;width:100%;}
+.search-bar input::placeholder{color:var(--muted);}
+
+/* HERO */
+.hero{padding:78px 1.2rem 2rem;background:
+  radial-gradient(ellipse at 70% 30%,rgba(230,57,70,.15) 0%,transparent 60%),
+  radial-gradient(ellipse at 20% 80%,rgba(247,37,133,.1) 0%,transparent 60%);}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.3);
+  border-radius:30px;padding:.25rem .9rem;font-size:.7rem;font-weight:700;
+  color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:.9rem;}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,11vw,5.5rem);
+  line-height:.95;letter-spacing:2px;margin-bottom:.8rem;}
+.hero h1 .r{color:var(--accent);}
+.hero h1 .o{color:var(--accent2);}
+.hero p{color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:1.2rem;}
+.hero-btns{display:flex;gap:.6rem;flex-wrap:wrap;}
+.btn{padding:.65rem 1.4rem;border-radius:10px;font-weight:700;font-size:.84rem;
+  cursor:pointer;border:none;transition:all .22s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--glow);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.hero-stats{display:flex;gap:2rem;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);}
+.stat-item .num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);}
+.stat-item .lbl{color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;}
+
+/* SECTIONS */
+section{padding:1.5rem 1.2rem;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;
+  display:flex;align-items:center;gap:.5rem;}
+.section-title::before{content:'';width:4px;height:1.4rem;
+  background:linear-gradient(var(--accent),var(--accent2));border-radius:3px;display:block;}
+.see-all{color:var(--accent);text-decoration:none;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;}
+
+/* GENRE */
+.genre-scroll{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:1.2rem;}
+.genre-scroll::-webkit-scrollbar{height:0;}
+.genre-pill{flex-shrink:0;padding:.38rem .9rem;border-radius:30px;background:var(--card);
+  border:1px solid var(--border);color:var(--muted);font-size:.76rem;font-weight:700;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.genre-pill:hover,.genre-pill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;color:#fff;}
+
+/* ANIME GRID */
+.anime-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:.9rem;}
+
+/* ANIME CARD */
+.anime-card{background:var(--card);border-radius:12px;overflow:hidden;
+  border:1px solid var(--border);cursor:pointer;
+  transition:transform .25s,border-color .25s,box-shadow .25s;}
+.anime-card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:var(--glow);}
+
+/* AI IMAGE AREA */
+.card-img-wrap{position:relative;width:100%;height:200px;overflow:hidden;background:var(--bg2);}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;}
+.anime-card:hover .card-img-wrap img{transform:scale(1.06);}
+
+/* AI Art Placeholder — shown while loading or on error */
+.ai-art{width:100%;height:200px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.5rem;
+  background:linear-gradient(135deg,#0d1225 0%,#1a0a1f 50%,#0d1225 100%);
+  position:relative;overflow:hidden;}
+.ai-art::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(230,57,70,.2),transparent 70%);}
+.ai-art-emoji{font-size:2.8rem;position:relative;z-index:1;
+  filter:drop-shadow(0 0 12px rgba(230,57,70,.6));animation:floatEmoji 3s ease-in-out infinite;}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.ai-art-title{position:relative;z-index:1;font-size:.65rem;color:var(--muted);
+  text-align:center;padding:0 .5rem;font-weight:600;}
+.ai-art-tag{position:relative;z-index:1;font-size:.58rem;
+  background:rgba(230,57,70,.2);border:1px solid rgba(230,57,70,.3);
+  color:var(--accent);padding:.1rem .4rem;border-radius:10px;font-weight:700;}
+
+/* Loading shimmer */
+.shimmer{background:linear-gradient(90deg,var(--bg2) 25%,#1a2540 50%,var(--bg2) 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.card-overlay{position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 55%);
+  opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:.6rem;}
+.anime-card:hover .card-overlay{opacity:1;}
+.play-mini{width:34px;height:34px;background:var(--accent);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin-left:auto;}
+
+.card-badge{position:absolute;top:.4rem;left:.4rem;background:var(--accent);color:#fff;
+  font-size:.58rem;font-weight:700;padding:.12rem .4rem;border-radius:4px;text-transform:uppercase;}
+.card-score{position:absolute;top:.4rem;right:.4rem;background:rgba(0,0,0,.85);
+  color:var(--gold);font-weight:700;font-size:.7rem;padding:.12rem .4rem;border-radius:4px;}
+.card-info{padding:.7rem;}
+.card-title{font-weight:700;font-size:.8rem;margin-bottom:.2rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta{color:var(--muted);font-size:.68rem;display:flex;gap:.35rem;align-items:center;}
+.dot{width:3px;height:3px;border-radius:50%;background:var(--muted);}
+
+/* TRENDING ROW */
+.trending-row{display:flex;gap:.65rem;overflow-x:auto;padding-bottom:.4rem;}
+.trending-row::-webkit-scrollbar{height:3px;}
+.trending-row::-webkit-scrollbar-thumb{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.trending-card{flex-shrink:0;width:110px;cursor:pointer;}
+.trending-img{position:relative;width:110px;height:155px;border-radius:9px;overflow:hidden;
+  border:2px solid transparent;transition:all .22s;background:var(--bg2);}
+.trending-card:hover .trending-img{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--glow);}
+.trending-img img{width:100%;height:100%;object-fit:cover;}
+.t-rank{position:absolute;top:.3rem;left:.35rem;font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.9);}
+.trending-name{font-size:.7rem;font-weight:700;margin-top:.25rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* LOAD MORE */
+.load-more{display:flex;justify-content:center;margin-top:1.5rem;}
+.load-more-btn{background:transparent;border:1px solid var(--accent);color:var(--accent);
+  padding:.65rem 2rem;border-radius:8px;font-weight:700;font-size:.86rem;cursor:pointer;transition:all .2s;}
+.load-more-btn:hover{background:var(--accent);color:#fff;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);
+  backdrop-filter:blur(14px);z-index:2000;display:none;
+  align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  max-width:600px;width:100%;max-height:92vh;overflow-y:auto;position:relative;
+  box-shadow:0 0 60px rgba(230,57,70,.2);}
+.modal-close{position:absolute;top:.65rem;right:.65rem;background:rgba(0,0,0,.7);
+  border:1px solid var(--border);color:var(--text);width:32px;height:32px;
+  border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;
+  align-items:center;justify-content:center;z-index:2;transition:background .2s;}
+.modal-close:hover{background:var(--accent);}
+
+/* VIDEO PLAYER */
+.video-wrap{position:relative;width:100%;padding-top:56.25%;background:#000;
+  border-radius:16px 16px 0 0;overflow:hidden;}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;}
+
+/* AI Description area in modal */
+.ai-desc-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:1rem;margin:.8rem 0;position:relative;}
+.ai-desc-box .ai-label{font-size:.65rem;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.4rem;}
+.ai-desc-box p{color:var(--muted);font-size:.84rem;line-height:1.7;}
+.ai-typing{display:inline-block;width:8px;height:14px;background:var(--accent);
+  margin-left:2px;animation:blink .7s step-end infinite;}
+@keyframes blink{50%{opacity:0}}
+
+.modal-body{padding:1.3rem;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;margin-bottom:.4rem;}
+.modal-meta{display:flex;gap:.6rem;color:var(--muted);font-size:.8rem;flex-wrap:wrap;
+  margin-bottom:.65rem;align-items:center;}
+.mbadge{background:var(--accent);color:#fff;font-size:.62rem;font-weight:700;
+  padding:.13rem .4rem;border-radius:4px;text-transform:uppercase;}
+.modal-genres{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem;}
+.fg{background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.2);
+  color:var(--accent);font-size:.67rem;padding:.16rem .52rem;border-radius:20px;font-weight:600;}
+
+/* ACTION BUTTONS */
+.action-btns{display:flex;gap:.55rem;flex-wrap:wrap;}
+.abtn{flex:1;min-width:110px;padding:.72rem 1rem;border-radius:10px;font-weight:700;
+  font-size:.82rem;cursor:pointer;border:none;transition:all .22s;
+  display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.abtn-watch{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--glow);}
+.abtn-watch:hover{transform:translateY(-2px);}
+.abtn-dl{background:linear-gradient(135deg,#1a6b3a,#22913f);color:#fff;}
+.abtn-dl:hover{transform:translateY(-2px);}
+.abtn-wish{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.abtn-wish:hover{border-color:#f72585;color:#f72585;}
+
+/* DOWNLOAD PANEL */
+.dl-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:1rem;margin-top:.8rem;display:none;}
+.dl-panel.show{display:block;}
+.dl-panel h4{font-size:.78rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.65rem;}
+.dl-opts{display:flex;flex-direction:column;gap:.4rem;}
+.dl-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:.55rem .85rem;transition:border-color .2s;}
+.dl-row:hover{border-color:var(--accent);}
+.dl-q{font-weight:700;font-size:.83rem;}
+.dl-s{font-size:.72rem;color:var(--muted);}
+.dl-go{background:var(--accent);color:#fff;border:none;
+  padding:.3rem .85rem;border-radius:6px;font-size:.74rem;font-weight:700;cursor:pointer;}
+.dl-go:hover{background:var(--accent2);}
+.dl-note{font-size:.7rem;color:var(--muted);margin-top:.65rem;text-align:center;}
+
+/* SCRAPER UI */
+.dl-searching{display:flex;flex-direction:column;align-items:center;gap:.6rem;padding:1rem 0;color:var(--muted);font-size:.8rem;}
+.dl-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dl-source-badge{display:inline-block;background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.25);color:var(--accent);font-size:.66rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;margin-bottom:.6rem;}
+.dl-quality-select{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;font-size:.78rem;color:var(--muted);}
+.dl-quality-select select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:.28rem .5rem;border-radius:6px;font-size:.76rem;outline:none;cursor:pointer;}
+.dl-ep-grid{display:flex;flex-wrap:wrap;gap:.35rem;max-height:180px;overflow-y:auto;padding-right:.2rem;margin-bottom:.5rem;}
+.dl-ep-grid::-webkit-scrollbar{width:3px;}
+.dl-ep-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;}
+.dl-ep-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:.3rem .55rem;border-radius:6px;font-size:.71rem;font-weight:700;cursor:pointer;transition:all .15s;min-width:46px;}
+.dl-ep-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-1px);}
+.dl-ep-btn:disabled{opacity:.5;cursor:wait;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.2rem;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:.75rem 1.1rem;font-size:.82rem;font-weight:600;
+  z-index:9999;transform:translateX(200%);transition:transform .3s;
+  display:flex;align-items:center;gap:.5rem;max-width:280px;}
+.toast.show{transform:translateX(0);}
+.toast.success{border-left:3px solid #22913f;}
+.toast.info{border-left:3px solid var(--accent);}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);
+  padding:1.8rem 1.2rem;text-align:center;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem;}
+footer p{color:var(--muted);font-size:.76rem;}
+
+.fade-in{animation:fi .35s ease forwards;}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Anime<span style="-webkit-text-fill-color:var(--gold)">All</span></div>
+  <div class="search-bar">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Search anime..."/>
+  </div>
+  <div style="display:flex;gap:.4rem;">
+    <button class="btn btn-ghost" style="font-size:.75rem;padding:.4rem .8rem" onclick="toast('🔥 Trending list updated!','info')">Trending</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge"><div class="pulse"></div> AI Powered • Live Images</div>
+  <h1>WATCH &amp;<br><span class="r">DOWNLOAD</span><br><span class="o">500+</span> ANIME</h1>
+  <p>Har anime ki real image AI se fetch hoti hai. HD quality, free download, sab ek jagah.</p>
+  <div class="hero-btns">
+    <a href="#popular" class="btn btn-primary">▶ Start Watching</a>
+    <a href="#movies" class="btn btn-ghost">🎬 Movies</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="num" id="statCount">120+</div><div class="lbl">Anime</div></div>
+    <div class="stat-item"><div class="num">AI</div><div class="lbl">Images</div></div>
+    <div class="stat-item"><div class="num">FREE</div><div class="lbl">Download</div></div>
+  </div>
+</div>
+
+<!-- GENRE -->
+<section style="padding-bottom:0">
+  <div class="genre-scroll" id="genreBar">
+    <div class="genre-pill active" data-g="all">🌟 All</div>
+    <div class="genre-pill" data-g="Action">⚔️ Action</div>
+    <div class="genre-pill" data-g="Adventure">🗺️ Adventure</div>
+    <div class="genre-pill" data-g="Comedy">😂 Comedy</div>
+    <div class="genre-pill" data-g="Drama">🎭 Drama</div>
+    <div class="genre-pill" data-g="Fantasy">🐉 Fantasy</div>
+    <div class="genre-pill" data-g="Horror">👻 Horror</div>
+    <div class="genre-pill" data-g="Mystery">🔍 Mystery</div>
+    <div class="genre-pill" data-g="Romance">❤️ Romance</div>
+    <div class="genre-pill" data-g="Sci-Fi">🚀 Sci-Fi</div>
+    <div class="genre-pill" data-g="Slice of Life">☕ Slice of Life</div>
+    <div class="genre-pill" data-g="Sports">⚽ Sports</div>
+    <div class="genre-pill" data-g="Supernatural">✨ Supernatural</div>
+    <div class="genre-pill" data-g="Thriller">😱 Thriller</div>
+    <div class="genre-pill" data-g="Psychological">🧠 Psychological</div>
+    <div class="genre-pill" data-g="Mecha">🤖 Mecha</div>
+    <div class="genre-pill" data-g="Isekai">🌀 Isekai</div>
+    <div class="genre-pill" data-g="MOVIE">🎬 Movies</div>
+  </div>
+</section>
+
+<!-- TRENDING -->
+<section id="trending">
+  <div class="section-header">
+    <div class="section-title">🔥 Trending Now</div>
+    <span class="see-all">Top Rated</span>
+  </div>
+  <div class="trending-row" id="trendRow"></div>
+</section>
+
+<!-- POPULAR -->
+<section id="popular">
+  <div class="section-header">
+    <div class="section-title">⭐ Most Popular</div>
+    <span class="see-all" id="popCnt">0 anime</span>
+  </div>
+  <div class="anime-grid" id="popGrid"></div>
+  <div class="load-more"><button class="load-more-btn" id="loadBtn">Load More ↓</button></div>
+</section>
+
+<!-- NEW -->
+<section id="new">
+  <div class="section-header">
+    <div class="section-title">🆕 New Season 2024</div>
+    <span class="see-all">Latest</span>
+  </div>
+  <div class="anime-grid" id="newGrid"></div>
+</section>
+
+<!-- MOVIES -->
+<section id="movies">
+  <div class="section-header">
+    <div class="section-title">🎬 Anime Movies</div>
+    <span class="see-all">All Films</span>
+  </div>
+  <div class="anime-grid" id="movGrid"></div>
+</section>
+
+<!-- SEARCH -->
+<section id="searchSec" style="display:none">
+  <div class="section-header">
+    <div class="section-title">🔍 Results</div>
+    <a href="#" class="see-all" id="clearBtn">✕ Clear</a>
+  </div>
+  <div class="anime-grid" id="searchGrid"></div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"></div>
+
+<footer>
+  <div class="footer-logo">AnimeAll</div>
+  <p>AI-Powered Images • 120+ Anime • Free Download</p>
+  <p style="margin-top:.3rem;font-size:.7rem">© 2024 AnimeAll</p>
+</footer>
+
+<script>
+// ═══════════════════════════════
+// JIKAN API — Free MyAnimeList API (no key needed!)
+// + Fallback beautiful art cards
+// ═══════════════════════════════
+
+// Image cache
+const imgCache = {};
+
+async function getAnimeImage(malId, title) {
+  if (imgCache[malId]) return imgCache[malId];
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/anime/${malId}`);
+    if (!res.ok) throw new Error('API failed');
+    const data = await res.json();
+    const url = data.data?.images?.jpg?.large_image_url || data.data?.images?.jpg?.image_url;
+    if (url) { imgCache[malId] = url; return url; }
+  } catch(e) {}
+  return null;
+}
+
+// ═══════════════════════════════
+// DB — with MyAnimeList IDs
+// ═══════════════════════════════
+const DB = [
+  {id:1,malId:5114,eng:"Fullmetal Alchemist: Brotherhood",yt:"CovMkWJNINU",genres:["Action","Adventure","Drama","Fantasy"],score:9.6,eps:64,fmt:"TV",year:2009,desc:"Do bhai alchemy se apni maa ko wapas laane ki koshish karte hain. Anime ka sabse bada masterpiece.",isNew:false,isMovie:false},
+  {id:2,malId:9253,eng:"Steins;Gate",yt:"2twj0p5mELs",genres:["Drama","Mystery","Sci-Fi","Thriller"],score:9.1,eps:24,fmt:"TV",year:2011,desc:"Ek scientist time travel invent karta hai aur devastating consequences face karta hai.",isNew:false,isMovie:false},
+  {id:3,malId:11061,eng:"Hunter x Hunter (2011)",yt:"D7aAjyU_Nek",genres:["Action","Adventure","Fantasy"],score:9.1,eps:148,fmt:"TV",year:2011,desc:"Gon apna baap dhundhne ke liye Hunter banta hai. Behtareen adventure ever made.",isNew:false,isMovie:false},
+  {id:4,malId:16498,eng:"Attack on Titan",yt:"MGRm4IzK1SQ",genres:["Action","Drama","Fantasy","Thriller"],score:9.0,eps:75,fmt:"TV",year:2013,desc:"Insaan walls ke andar rehte hain — giants se bachne ke liye. Legendary.",isNew:false,isMovie:false},
+  {id:5,malId:918,eng:"Gintama",yt:"TRXDy1rGFiE",genres:["Action","Comedy","Sci-Fi"],score:9.0,eps:201,fmt:"TV",year:2006,desc:"Aliens ne feudal Japan le liya — ek samurai odd jobs karta hai. Comedy ka badshah.",isNew:false,isMovie:false},
+  {id:6,malId:101348,eng:"Vinland Saga",yt:"Wnzj0jqEi5s",genres:["Action","Adventure","Drama"],score:8.8,eps:24,fmt:"TV",year:2019,desc:"Ek young Viking apne baap ki maut ka badla lene nikla hai. Raw masterpiece.",isNew:false,isMovie:false},
+  {id:7,malId:101922,eng:"Demon Slayer",yt:"VQGCKyvzIM4",genres:["Action","Fantasy","Supernatural"],score:8.8,eps:26,fmt:"TV",year:2019,desc:"Tanjirou demon slayer banta hai apne parivaar ka badla lene. Stunning animation.",isNew:false,isMovie:false},
+  {id:8,malId:20583,eng:"Haikyuu!!",yt:"kPHt6DMHFtY",genres:["Comedy","Drama","Sports"],score:8.9,eps:25,fmt:"TV",year:2014,desc:"Ek chota volleyball player nationals tak pohunchne ka sapna dekhta hai.",isNew:false,isMovie:false},
+  {id:9,malId:21087,eng:"One Punch Man",yt:"qW4a3K3_hFo",genres:["Action","Comedy","Supernatural"],score:8.7,eps:12,fmt:"TV",year:2015,desc:"Saitama ek punch mein sabko uda deta hai — worthy opponent dhoond raha hai.",isNew:false,isMovie:false},
+  {id:10,malId:1535,eng:"Death Note",yt:"NlJZ-YgAt-c",genres:["Mystery","Psychological","Thriller","Supernatural"],score:8.5,eps:37,fmt:"TV",year:2006,desc:"Light ko ek notebook milti hai — jo bhi naam likha woh mar jaata hai.",isNew:false,isMovie:false},
+  {id:11,malId:20,eng:"Naruto",yt:"QczyVBl0G3s",genres:["Action","Adventure","Comedy","Supernatural"],score:7.9,eps:220,fmt:"TV",year:2002,desc:"Ek ninja Hokage banna chahta hai. The original big three ka aaghaz.",isNew:false,isMovie:false},
+  {id:12,malId:1735,eng:"Naruto Shippuden",yt:"rMrVvD1QDOA",genres:["Action","Adventure","Fantasy"],score:8.4,eps:500,fmt:"TV",year:2007,desc:"Naruto adult ho ke wapas aata hai — bade threats face karta hai.",isNew:false,isMovie:false},
+  {id:13,malId:21,eng:"One Piece",yt:"MCH11haRt3o",genres:["Action","Adventure","Comedy","Fantasy"],score:8.7,eps:null,fmt:"TV",year:1999,desc:"Luffy Pirate King banna chahta hai. Sabse lamba aur epic adventure ever made.",isNew:false,isMovie:false},
+  {id:14,malId:813,eng:"Dragon Ball Z",yt:"aMTKZVB8YeA",genres:["Action","Adventure","Fantasy"],score:8.3,eps:291,fmt:"TV",year:1989,desc:"Goku aur dost Earth ko har taraf se aate threats se bachate hain.",isNew:false,isMovie:false},
+  {id:15,malId:269,eng:"Bleach",yt:"A-jcGSe46B8",genres:["Action","Adventure","Supernatural"],score:7.8,eps:366,fmt:"TV",year:2004,desc:"Ichigo Soul Reaper powers paata hai. Classic shonen at its finest.",isNew:false,isMovie:false},
+  {id:16,malId:41467,eng:"Bleach: TYBW",yt:"KCsRkKRHQms",genres:["Action","Adventure","Supernatural"],score:9.0,eps:52,fmt:"TV",year:2022,desc:"Bleach ka final arc — epic battles, stunning animation. The return of a legend.",isNew:true,isMovie:false},
+  {id:17,malId:31964,eng:"My Hero Academia",yt:"ct5uj00RRdI",genres:["Action","Comedy","Supernatural"],score:8.0,eps:113,fmt:"TV",year:2016,desc:"Bina power ke ladka duniya ka greatest hero banta hai. Super inspiring.",isNew:false,isMovie:false},
+  {id:18,malId:40748,eng:"Jujutsu Kaisen",yt:"pkKu9hLT-t8",genres:["Action","Fantasy","Supernatural"],score:8.7,eps:24,fmt:"TV",year:2020,desc:"Itadori ek cursed spirit swallow karta hai. Absolute banger.",isNew:false,isMovie:false},
+  {id:19,malId:44511,eng:"Chainsaw Man",yt:"VqsYMx_6sUM",genres:["Action","Horror","Supernatural"],score:8.7,eps:12,fmt:"TV",year:2022,desc:"Denji chainsaw devil se merge hota hai. Wild, unpredictable aur addictive.",isNew:false,isMovie:false},
+  {id:20,malId:50265,eng:"Spy x Family",yt:"WH4Bnb8UWGM",genres:["Action","Comedy","Slice of Life"],score:8.6,eps:25,fmt:"TV",year:2022,desc:"Spy ek fake family banata hai — wife actually assassin hai. Wholesome chaos.",isNew:false,isMovie:false},
+  {id:21,malId:52991,eng:"Frieren: Beyond Journey's End",yt:"oFtMTgGKgyk",genres:["Adventure","Drama","Fantasy","Slice of Life"],score:9.2,eps:28,fmt:"TV",year:2023,desc:"Elf mage companions ke jaane ke baad zindagi ke baare mein sochti hai.",isNew:true,isMovie:false},
+  {id:22,malId:55791,eng:"Oshi no Ko",yt:"PX4hWvRBJRw",genres:["Drama","Mystery","Supernatural"],score:8.6,eps:11,fmt:"TV",year:2023,desc:"Doctor apni idol ke bachche ke roop mein reincarnate hota hai.",isNew:true,isMovie:false},
+  {id:23,malId:53887,eng:"Dandadan",yt:"0U0Z_J-OicY",genres:["Action","Comedy","Romance","Supernatural"],score:8.7,eps:12,fmt:"TV",year:2024,desc:"Ladki aur ladka aliens aur ghosts encounter karte hain. Absolutely insane.",isNew:true,isMovie:false},
+  {id:24,malId:57334,eng:"Solo Leveling",yt:"BRzOKxqQ9FA",genres:["Action","Adventure","Fantasy"],score:8.5,eps:12,fmt:"TV",year:2024,desc:"Duniya ka sabse kamzor hunter level-up karna shuru karta hai.",isNew:true,isMovie:false},
+  {id:25,malId:31240,eng:"Re:ZERO",yt:"7QFJm4Pv0P4",genres:["Drama","Fantasy","Psychological","Thriller"],score:8.4,eps:25,fmt:"TV",year:2016,desc:"Subaru fantasy world mein jaata hai — mar ke wapas aata hai.",isNew:false,isMovie:false},
+  {id:26,malId:29803,eng:"No Game No Life",yt:"sAf4r-4-EhQ",genres:["Adventure","Comedy","Fantasy","Isekai"],score:8.2,eps:12,fmt:"TV",year:2014,desc:"Genius gamer siblings ek aisi duniya mein jaate hain jahan sab games se decide hota hai.",isNew:false,isMovie:false},
+  {id:27,malId:30831,eng:"KonoSuba",yt:"1ANTbpWBYfI",genres:["Adventure","Comedy","Fantasy","Isekai"],score:8.2,eps:10,fmt:"TV",year:2016,desc:"Ladka fantasy world mein reincarnate hota hai — useless goddess ke saath.",isNew:false,isMovie:false},
+  {id:28,malId:47778,eng:"Blue Lock",yt:"MF8EEt_ULb4",genres:["Action","Sports"],score:8.3,eps:24,fmt:"TV",year:2022,desc:"300 strikers compete karte hain Japan ka best soccer player banne.",isNew:false,isMovie:false},
+  {id:29,malId:33,eng:"Berserk",yt:"WXDonWQMxEI",genres:["Action","Adventure","Drama","Fantasy","Horror"],score:8.7,eps:25,fmt:"TV",year:1997,desc:"Lone mercenary warriors ke band mein shaamil hota hai — dark destiny face karta hai.",isNew:false,isMovie:false},
+  {id:30,malId:22319,eng:"Tokyo Ghoul",yt:"vGq5fFkzFxE",genres:["Action","Drama","Horror","Mystery","Supernatural"],score:7.8,eps:12,fmt:"TV",year:2014,desc:"College student half-ghoul ban jaata hai. Dark and atmospheric.",isNew:false,isMovie:false},
+  {id:31,malId:30,eng:"Neon Genesis Evangelion",yt:"2-MLjh5Y_Wk",genres:["Action","Drama","Mecha","Psychological","Sci-Fi"],score:8.4,eps:26,fmt:"TV",year:1995,desc:"Teenagers mechs chalate hain Angels se ladne. Psychological masterpiece.",isNew:false,isMovie:false},
+  {id:32,malId:1,eng:"Cowboy Bebop",yt:"qig4KOK2R2g",genres:["Action","Adventure","Comedy","Drama","Sci-Fi"],score:8.8,eps:26,fmt:"TV",year:1998,desc:"Bounty hunters solar system mein travel karte hain. Jazz + noir = perfection.",isNew:false,isMovie:false},
+  {id:33,malId:1575,eng:"Code Geass",yt:"BfhMCMgCaug",genres:["Action","Drama","Mecha","Sci-Fi","Thriller"],score:8.7,eps:25,fmt:"TV",year:2006,desc:"Exiled prince mind control powers paata hai — rebellion lead karta hai.",isNew:false,isMovie:false},
+  {id:34,malId:2001,eng:"Gurren Lagann",yt:"Vhx4z8GbIGg",genres:["Action","Adventure","Mecha","Sci-Fi"],score:8.7,eps:27,fmt:"TV",year:2007,desc:"Do boys mech dhundte hain aur universe ke ruler ko challenge karte hain.",isNew:false,isMovie:false},
+  {id:35,malId:11757,eng:"Sword Art Online",yt:"6ohYYtxfDCg",genres:["Action","Adventure","Fantasy","Romance"],score:7.5,eps:25,fmt:"TV",year:2012,desc:"Players virtual reality MMORPG mein trapped hain. The original isekai.",isNew:false,isMovie:false},
+  {id:36,malId:20665,eng:"Your Lie in April",yt:"4UhEjLIh9VU",genres:["Drama","Music","Romance","Slice of Life"],score:8.8,eps:22,fmt:"TV",year:2014,desc:"Piano prodigy jo sun nahin sakta — ek violinist se pyaar karta hai.",isNew:false,isMovie:false},
+  {id:37,malId:22147,eng:"Clannad: After Story",yt:"OWOEkONKbCM",genres:["Drama","Fantasy","Romance","Slice of Life"],score:9.0,eps:24,fmt:"TV",year:2008,desc:"Tomoya aur Nagisa zindagi ki mushkilon ka saamna karte hain. Ultimate emotional anime.",isNew:false,isMovie:false},
+  {id:38,malId:6746,eng:"Durarara!!",yt:"RJxfqVJgL6E",genres:["Action","Drama","Mystery","Supernatural"],score:8.4,eps:24,fmt:"TV",year:2010,desc:"Ordinary aur extraordinary log Ikebukuro ke underground world mein milte hain.",isNew:false,isMovie:false},
+  {id:39,malId:205,eng:"Samurai Champloo",yt:"fHT8Yb5TQLU",genres:["Action","Adventure","Comedy","Drama"],score:8.5,eps:26,fmt:"TV",year:2004,desc:"Ek ladki aur do swordsmen Edo-period Japan cross karte hain. Hip-hop + samurai.",isNew:false,isMovie:false},
+  {id:40,malId:87216,eng:"Mob Psycho 100",yt:"KZD1U_x0NEY",genres:["Action","Comedy","Slice of Life","Supernatural"],score:8.5,eps:12,fmt:"TV",year:2016,desc:"Psychic ladka con artist exorcist ke under kaam karta hai. Emotional and funny.",isNew:false,isMovie:false},
+  {id:41,malId:101759,eng:"The Promised Neverland",yt:"B9WT1JMKaJo",genres:["Horror","Mystery","Psychological","Thriller"],score:8.5,eps:12,fmt:"TV",year:2019,desc:"Orphan bacche apni zindagi ki dark sach dhundte hain. Escape thriller.",isNew:false,isMovie:false},
+  {id:42,malId:21827,eng:"Violet Evergarden",yt:"0CJeDetA45Q",genres:["Drama","Fantasy","Slice of Life"],score:8.6,eps:13,fmt:"TV",year:2018,desc:"Ex-soldier letter writer banti hai 'I love you' samajhne ke liye.",isNew:false,isMovie:false},
+  {id:43,malId:14719,eng:"JoJo's Bizarre Adventure",yt:"gbAByslRvCg",genres:["Action","Adventure","Drama","Supernatural"],score:8.5,eps:26,fmt:"TV",year:2012,desc:"Joestar family ki multigenerational saga supernatural forces ke against.",isNew:false,isMovie:false},
+  {id:44,malId:13601,eng:"Psycho-Pass",yt:"wH8EjkdE-xY",genres:["Action","Drama","Mystery","Psychological","Sci-Fi"],score:8.5,eps:22,fmt:"TV",year:2012,desc:"Future mein detectors criminal potential measure karte hain. Dark.",isNew:false,isMovie:false},
+  {id:45,malId:97986,eng:"Made in Abyss",yt:"5FWHzFVK93A",genres:["Adventure","Drama","Fantasy","Mystery","Sci-Fi"],score:8.6,eps:13,fmt:"TV",year:2017,desc:"Ladki mysterious abyss mein utarti hai apni maa dhundhne. Deceptively dark.",isNew:false,isMovie:false},
+  {id:46,malId:52034,eng:"Vinland Saga S2",yt:"IqO_8dpTFEQ",genres:["Action","Adventure","Drama"],score:9.0,eps:24,fmt:"TV",year:2023,desc:"Thorfinn slave farm mein kaam karta hai — peace ka meaning dhoondta hai.",isNew:true,isMovie:false},
+  {id:47,malId:52701,eng:"Dungeon Meshi",yt:"A4e_c4jRpEA",genres:["Adventure","Comedy","Fantasy"],score:9.0,eps:24,fmt:"TV",year:2024,desc:"Party dungeon explore karti hai aur monsters paka ke khaati hai. Unique masterpiece.",isNew:true,isMovie:false},
+  {id:48,malId:53446,eng:"Apothecary Diaries",yt:"YHnFxc3pNI8",genres:["Drama","Mystery","Romance"],score:8.8,eps:24,fmt:"TV",year:2023,desc:"Pharmacist ki beti imperial court mein mysteries solve karti hai.",isNew:true,isMovie:false},
+  {id:49,malId:50265,eng:"Bocchi the Rock!",yt:"MfpwJcCwz_4",genres:["Comedy","Drama","Music","Slice of Life"],score:9.0,eps:12,fmt:"TV",year:2022,desc:"Extreme introvert ek band join karne ki koshish karta hai.",isNew:false,isMovie:false},
+  {id:50,malId:48316,eng:"Jujutsu Kaisen S2",yt:"PPUmHRRbASQ",genres:["Action","Fantasy","Supernatural"],score:9.0,eps:23,fmt:"TV",year:2023,desc:"Shibuya Incident arc — devastating aur emotional. Absolute cinema.",isNew:true,isMovie:false},
+  // MOVIES
+  {id:51,malId:199,eng:"Spirited Away",yt:"ByXuk9QqQkk",genres:["Adventure","Fantasy","Supernatural"],score:9.3,eps:1,fmt:"MOVIE",year:2001,desc:"Ladki spirit world mein enter karti hai. Ghibli ka greatest masterpiece.",isNew:false,isMovie:true},
+  {id:52,malId:32281,eng:"Your Name",yt:"xU47nhruN-Q",genres:["Drama","Romance","Supernatural"],score:9.1,eps:1,fmt:"MOVIE",year:2016,desc:"Do strangers bodies swap karte hain — disaster se pehle ek dusre ko dhundna padta hai.",isNew:false,isMovie:true},
+  {id:53,malId:28851,eng:"A Silent Voice",yt:"nfK6UgLra7o",genres:["Drama","Romance","Slice of Life"],score:9.0,eps:1,fmt:"MOVIE",year:2016,desc:"Ladka deaf ladki ko bully karta tha — saaloh baad maafi maangta hai.",isNew:false,isMovie:true},
+  {id:54,malId:522,eng:"Princess Mononoke",yt:"4OiMa4FrmZE",genres:["Action","Adventure","Fantasy"],score:8.9,eps:1,fmt:"MOVIE",year:1997,desc:"Young prince forest gods aur humans ke beech conflict mein phans jaata hai.",isNew:false,isMovie:true},
+  {id:55,malId:578,eng:"Grave of the Fireflies",yt:"4vPeTSRd580",genres:["Drama"],score:8.9,eps:1,fmt:"MOVIE",year:1988,desc:"Do siblings WW2 ke end mein Japan mein survive karne ki koshish karte hain.",isNew:false,isMovie:true},
+  {id:56,malId:431,eng:"Howl's Moving Castle",yt:"iwROgK94zcM",genres:["Adventure","Drama","Fantasy","Romance"],score:8.8,eps:1,fmt:"MOVIE",year:2004,desc:"Old bani ladki wizard Howl ke moving castle mein uski help dhoondti hai.",isNew:false,isMovie:true},
+  {id:57,malId:40748,eng:"Demon Slayer: Mugen Train",yt:"tqCdA8Odlp4",genres:["Action","Fantasy","Supernatural"],score:8.8,eps:1,fmt:"MOVIE",year:2020,desc:"Tanjiro Mugen Train mein mysterious disappearances investigate karne jaata hai.",isNew:false,isMovie:true},
+  {id:58,malId:38000,eng:"Weathering With You",yt:"Q6iK6DjrgKk",genres:["Drama","Fantasy","Romance","Supernatural"],score:8.5,eps:1,fmt:"MOVIE",year:2019,desc:"Runaway boy meets girl jo weather control kar sakti hai. Makoto Shinkai magic.",isNew:false,isMovie:true},
+  {id:59,malId:431,eng:"Perfect Blue",yt:"ky0g7N8KTqk",genres:["Drama","Horror","Psychological","Thriller"],score:8.6,eps:1,fmt:"MOVIE",year:1997,desc:"Pop idol actress banne ki koshish mein identity lose karti hai. Masterful.",isNew:false,isMovie:true},
+  {id:60,malId:13413,eng:"Wolf Children",yt:"QNWvpZNFOsI",genres:["Drama","Fantasy","Romance","Slice of Life"],score:8.7,eps:1,fmt:"MOVIE",year:2012,desc:"Aurat apne wolf-human bachon ko unke baap ke marne ke baad palti hai.",isNew:false,isMovie:true},
+];
+
+// Emoji map for beautiful fallback cards
+const genreEmoji = {Action:'⚔️',Adventure:'🗺️',Comedy:'😂',Drama:'🎭',Fantasy:'🐉',Horror:'👻',Mystery:'🔍',Romance:'❤️','Sci-Fi':'🚀','Slice of Life':'☕',Sports:'⚽',Supernatural:'✨',Thriller:'😱',Psychological:'🧠',Mecha:'🤖',Isekai:'🌀',Music:'🎵',MOVIE:'🎬'};
+
+function getEmoji(genres){ return genreEmoji[genres[0]]||'🌟'; }
+
+// ═══════════════════════════════
+// BUILD CARD — lazy loads image via Jikan API
+// ═══════════════════════════════
+function buildCard(a){
+  const eps = a.eps ? `${a.eps} eps` : (a.isMovie ? 'Movie' : 'Ongoing');
+  const cardId = `card-img-${a.id}`;
+  return `
+  <div class="anime-card fade-in" onclick="openModal(${a.id})">
+    <div class="card-img-wrap" id="${cardId}">
+      <div class="ai-art shimmer">
+        <div class="ai-art-emoji">${getEmoji(a.genres)}</div>
+        <div class="ai-art-title">${a.eng}</div>
+        <div class="ai-art-tag">Loading...</div>
+      </div>
+      <div class="card-overlay">
+        <div class="play-mini">
+          <svg width="13" height="13" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      ${a.isNew?'<div class="card-badge">NEW</div>':''}
+      ${a.isMovie?'<div class="card-badge" style="background:#f72585">MOVIE</div>':''}
+      <div class="card-score">★ ${a.score}</div>
+    </div>
+    <div class="card-info">
+      <div class="card-title">${a.eng}</div>
+      <div class="card-meta"><span>${a.year}</span><span class="dot"></span><span>${a.fmt}</span><span class="dot"></span><span>${eps}</span></div>
+    </div>
+  </div>`;
+}
+
+// Load image async after card renders
+async function loadCardImage(a, containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const url = await getAnimeImage(a.malId, a.eng);
+  if(url && document.getElementById(containerId)){
+    const overlay = wrap.querySelector('.card-overlay');
+    const badge = wrap.querySelector('.card-badge');
+    const score = wrap.querySelector('.card-score');
+    // Remove shimmer placeholder
+    wrap.innerHTML='';
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = a.eng;
+    img.style.cssText='width:100%;height:200px;object-fit:cover;display:block;transition:transform .3s;';
+    img.onerror = ()=>{
+      wrap.innerHTML=`<div class="ai-art"><div class="ai-art-emoji">${getEmoji(a.genres)}</div><div class="ai-art-title">${a.eng}</div><div class="ai-art-tag">${a.year}</div></div>`;
+      reAddBadges(wrap,a);
+    };
+    wrap.appendChild(img);
+    // Re-add overlay + badges
+    reAddBadges(wrap,a);
+    const ov = document.createElement('div');
+    ov.className='card-overlay';
+    ov.innerHTML='<div class="play-mini"><svg width="13" height="13" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+    wrap.appendChild(ov);
+  }
+}
+
+function reAddBadges(wrap,a){
+  if(a.isNew){
+    const b=document.createElement('div');b.className='card-badge';b.textContent='NEW';wrap.appendChild(b);
+  }
+  if(a.isMovie){
+    const b=document.createElement('div');b.className='card-badge';b.style.background='#f72585';b.textContent='MOVIE';wrap.appendChild(b);
+  }
+  const s=document.createElement('div');s.className='card-score';s.textContent='★ '+a.score;wrap.appendChild(s);
+}
+
+// Intersection Observer for lazy loading
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const wrap = entry.target;
+      const id = wrap.id.replace('card-img-','');
+      const anime = DB.find(a=>a.id==id);
+      if(anime){ loadCardImage(anime, wrap.id); observer.unobserve(wrap); }
+    }
+  });
+},{rootMargin:'200px'});
+
+function observeCards(){
+  document.querySelectorAll('[id^="card-img-"]').forEach(el=>{
+    if(el.querySelector('.ai-art')) observer.observe(el);
+  });
+}
+
+// ═══════════════════════════════
+// STATE & RENDER
+// ═══════════════════════════════
+let page=0, perPage=20, activeGenre='all', filtered=[...DB];
+
+function renderTrending(){
+  const top = DB.filter(a=>a.score>=8.7&&!a.isMovie).slice(0,10);
+  document.getElementById('trendRow').innerHTML = top.map((a,i)=>{
+    const tid = `trend-img-${a.id}`;
+    setTimeout(()=>loadCardImage(a, tid),i*150);
+    return `<div class="trending-card" onclick="openModal(${a.id})">
+      <div class="trending-img" id="${tid}">
+        <div class="ai-art" style="height:155px;"><div class="ai-art-emoji">${getEmoji(a.genres)}</div></div>
+        <div class="t-rank">${i+1}</div>
+      </div>
+      <div class="trending-name">${a.eng}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderPopular(){
+  const sorted = [...filtered].filter(a=>!a.isMovie).sort((a,b)=>b.score-a.score);
+  const show = sorted.slice(0,(page+1)*perPage);
+  document.getElementById('popGrid').innerHTML = show.map(buildCard).join('');
+  document.getElementById('popCnt').textContent = sorted.length+' anime';
+  document.getElementById('loadBtn').style.display = show.length>=sorted.length?'none':'';
+  setTimeout(observeCards, 100);
+}
+
+function renderNew(){
+  const n = filtered.filter(a=>a.isNew&&!a.isMovie).slice(0,8);
+  document.getElementById('newGrid').innerHTML = n.map(buildCard).join('');
+  setTimeout(observeCards,100);
+}
+
+function renderMovies(){
+  const m = filtered.filter(a=>a.isMovie).slice(0,8);
+  document.getElementById('movGrid').innerHTML = m.map(buildCard).join('');
+  setTimeout(observeCards,100);
+}
+
+// ═══════════════════════════════
+// MODAL
+// ═══════════════════════════════
+async function openModal(id){
+  const a = DB.find(x=>x.id===id);
+  if(!a) return;
+  const eps = a.eps ? `${a.eps} Episodes` : (a.isMovie?'Movie':'Ongoing');
+
+  document.getElementById('modal').innerHTML=`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/${a.yt}?autoplay=1&rel=0&modestbranding=1"
+        frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+        allowfullscreen></iframe>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title">${a.eng}</div>
+      <div class="modal-meta">
+        <span class="mbadge">${a.fmt}</span>
+        <span>⭐ ${a.score}/10</span>
+        <span>${a.year}</span>
+        <span>${eps}</span>
+      </div>
+      <div class="modal-genres">${a.genres.map(g=>`<span class="fg">${g}</span>`).join('')}</div>
+      
+      <div class="ai-desc-box">
+        <div class="ai-label">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          AI Description
+        </div>
+        <p id="aiDescText">${a.desc}<span class="ai-typing"></span></p>
+      </div>
+      
+      <div class="action-btns">
+        <button class="abtn abtn-watch" onclick="toast('▶ Full streaming coming soon! YouTube trailer chal raha hai.','info')">
+          <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch
+        </button>
+        <button class="abtn abtn-dl" onclick="toggleDl(${a.id})">⬇ Download</button>
+        <button class="abtn abtn-wish" onclick="addWish(${a.id})">♡ Save</button>
+      </div>
+      
+      <div class="dl-panel" id="dl_${a.id}" data-anime="${a.eng}" data-malid="${a.malId}">
+        <h4>⬇ Download Panel</h4>
+        <div class="dl-note">🔍 Click Download button → GogoAnime/AnimePahe/Nyaa se links laayega</div>
+      </div>
+    </div>`;
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Remove typing cursor after 1.5s
+  setTimeout(()=>{
+    const cursor = document.querySelector('.ai-typing');
+    if(cursor) cursor.remove();
+  }, 1500);
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function toggleDl(id){
+  const p = document.getElementById('dl_'+id);
+  if(!p) return;
+  const isOpen = p.classList.contains('show');
+  p.classList.toggle('show');
+  // Agar pehli baar khul raha hai → scraper se links fetch karo
+  if(!isOpen && !p.dataset.loaded) {
+    const anime = p.dataset.anime;
+    const malId = p.dataset.malid;
+    fetchScraperLinks(id, anime, malId);
+  }
+}
+
+// ─── SCRAPER: Search + Episode List fetch ───────────────
+async function fetchScraperLinks(animeId, animeName, malId) {
+  const panel = document.getElementById('dl_'+animeId);
+  if(!panel) return;
+
+  panel.dataset.loaded = '1';
+  panel.innerHTML = `
+    <h4>📡 Searching Sources...</h4>
+    <div class="dl-searching">
+      <div class="dl-spinner"></div>
+      <p>GogoAnime, AnimePahe se links dhoondh rahe hain...</p>
+    </div>`;
+
+  try {
+    const res = await fetch(`scraper.php?action=search&anime=${encodeURIComponent(animeName)}&quality=720p`);
+    const data = await res.json();
+
+    if(data.status === 'ok' && data.episodes && data.episodes.length > 0) {
+      renderEpisodePanel(panel, data, animeId, animeName);
+    } else if(data.status === 'ok' && data.results && data.results.length > 0) {
+      renderEpisodePanel(panel, data, animeId, animeName);
+    } else {
+      // Fallback: Nyaa torrent
+      const nyaa = await fetch(`scraper.php?action=nyaa&anime=${encodeURIComponent(animeName)}&quality=720p`);
+      const nyaaData = await nyaa.json();
+      if(nyaaData.status === 'ok') {
+        renderNyaaPanel(panel, nyaaData, animeName);
+      } else {
+        panel.innerHTML = `<h4>❌ Koi link nahi mila</h4><div class="dl-note">Source pe anime available nahi. Doosra naam try karo.</div>`;
+      }
+    }
+  } catch(e) {
+    panel.innerHTML = `
+      <h4>📦 Select Quality</h4>
+      <div class="dl-opts">
+        ${['4K (~2.1 GB/ep)','1080p (~700 MB/ep)','720p (~350 MB/ep)','480p (~150 MB/ep)'].map(q=>`
+        <div class="dl-row">
+          <div><div class="dl-q">${q.split(' ')[0]}</div><div class="dl-s">${q.split(' ').slice(1).join(' ')}</div></div>
+          <button class="dl-go" onclick="startDl('${q.split(' ')[0]}','${animeName}',0)">⬇ Download</button>
+        </div>`).join('')}
+      </div>
+      <div class="dl-note">⚠️ scraper.php server pe chahiye</div>`;
+  }
+}
+
+// ─── Episode list render ──────────────────────────────
+function renderEpisodePanel(panel, data, animeId, animeName) {
+  const episodes = data.episodes || [];
+  const source   = data.source   || 'unknown';
+  const srcBadge = source === 'gogoanime' ? '🟢 GogoAnime' : source === 'animepahe' ? '🔵 AnimePahe' : '📡 ' + source;
+
+  let html = `
+    <h4>📥 Download Episode</h4>
+    <div class="dl-source-badge">${srcBadge} • ${episodes.length} Episodes mili</div>
+    <div class="dl-quality-select">
+      <label>Quality:</label>
+      <select id="qlty_${animeId}" onchange="updateEpButtons(${animeId})">
+        <option value="1080p">1080p HD</option>
+        <option value="720p" selected>720p</option>
+        <option value="480p">480p</option>
+        <option value="360p">360p</option>
+      </select>
+    </div>`;
+
+  if(episodes.length > 0) {
+    html += `<div class="dl-ep-grid" id="epgrid_${animeId}">`;
+    episodes.slice(0, 50).forEach(ep => {
+      html += `<button class="dl-ep-btn" 
+        onclick="downloadEpisode('${encodeURIComponent(ep.url)}','${encodeURIComponent(animeName)}_ep${ep.ep}',${animeId})"
+        title="Episode ${ep.ep}">
+        EP ${ep.ep}
+      </button>`;
+    });
+    html += `</div>`;
+    if(episodes.length > 50) {
+      html += `<div class="dl-note">Showing 50/${episodes.length} eps</div>`;
+    }
+  } else {
+    // No episodes but anime found — direct search link
+    html += `<div class="dl-opts">
+      ${['1080p','720p','480p'].map(q=>`
+      <div class="dl-row">
+        <div><div class="dl-q">${q}</div><div class="dl-s">${source}</div></div>
+        <button class="dl-go" onclick="startDl('${q}','${animeName}',0)">⬇ Download</button>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  html += `<div class="dl-note">🟢 Real links • ${source} se scrape kiya</div>`;
+  panel.innerHTML = html;
+}
+
+// ─── Episode download → get direct links ─────────────
+async function downloadEpisode(epUrlEncoded, nameEncoded, animeId) {
+  const epUrl  = decodeURIComponent(epUrlEncoded);
+  const name   = decodeURIComponent(nameEncoded);
+  const quality = document.getElementById('qlty_'+animeId)?.value || '720p';
+
+  toast(`🔍 "${name}" ke liye ${quality} link dhoondh raha hai...`, 'info');
+
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '⏳';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`scraper.php?action=getlinks&ep_url=${encodeURIComponent(epUrl)}&quality=${quality}`);
+    const data = await res.json();
+
+    btn.textContent = orig;
+    btn.disabled = false;
+
+    if(data.status === 'ok' && data.links && data.links.length > 0) {
+      // Best link: prefer direct mp4 over stream
+      const direct = data.links.find(l => l.url.endsWith('.mp4') || l.url.endsWith('.mkv'));
+      const best   = direct || data.links[0];
+
+      toast(`✅ Link mila! Download shuru ho raha hai...`, 'success');
+
+      // Single click download via proxy
+      const proxyUrl = `scraper.php?action=download&url=${encodeURIComponent(best.url)}&name=${encodeURIComponent(name + '_' + quality)}`;
+      const a = document.createElement('a');
+      a.href     = proxyUrl;
+      a.download = name + '.mp4';
+      a.click();
+
+      // Agar multiple links hain → show them
+      if(data.links.length > 1) {
+        showLinksModal(data.links, name, quality);
+      }
+    } else {
+      // Nyaa fallback
+      toast('⚠️ Direct link nahi mila — Nyaa search khol raha hai', 'info');
+      window.open(`https://nyaa.si/?q=${encodeURIComponent(name + ' ' + quality)}&c=1_2`, '_blank');
+    }
+  } catch(e) {
+    btn.textContent = orig;
+    btn.disabled = false;
+    toast('❌ Server error — direct page pe jao', 'info');
+    window.open(epUrl, '_blank');
+  }
+}
+
+// ─── Multiple links popup ─────────────────────────────
+function showLinksModal(links, name, quality) {
+  const existing = document.getElementById('linksModal');
+  if(existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'linksModal';
+  div.style.cssText = `position:fixed;bottom:5rem;right:1.2rem;background:var(--card);
+    border:1px solid var(--accent);border-radius:12px;padding:1rem;z-index:9998;
+    max-width:300px;width:90%;box-shadow:0 0 30px rgba(230,57,70,.3);`;
+
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+      <span style="font-weight:700;font-size:.8rem">📥 Saare Links (${links.length})</span>
+      <button onclick="this.parentElement.parentElement.remove()" 
+        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    ${links.slice(0,6).map((l,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;
+      padding:.4rem .6rem;margin:.25rem 0;background:var(--bg2);border-radius:6px;gap:.4rem">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.72rem;font-weight:700">${l.label || 'Link '+(i+1)}</div>
+        <div style="font-size:.62rem;color:var(--muted)">${l.method || 'direct'}</div>
+      </div>
+      <a href="scraper.php?action=download&url=${encodeURIComponent(l.url)}&name=${encodeURIComponent(name)}"
+        download style="background:var(--accent);color:#fff;padding:.28rem .65rem;
+        border-radius:5px;font-size:.7rem;font-weight:700;text-decoration:none">⬇</a>
+    </div>`).join('')}`;
+
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 12000);
+}
+
+// ─── Nyaa torrent panel ───────────────────────────────
+function renderNyaaPanel(panel, data, animeName) {
+  let html = `
+    <h4>🧲 Torrent Links (Nyaa)</h4>
+    <div class="dl-source-badge">⚫ Nyaa.si • ${data.count} torrents mili</div>
+    <div class="dl-opts">`;
+
+  data.results.slice(0,5).forEach(item => {
+    html += `
+    <div class="dl-row" style="flex-direction:column;align-items:flex-start;gap:.3rem">
+      <div class="dl-q" style="font-size:.72rem;white-space:normal">${item.title}</div>
+      <div style="display:flex;gap:.4rem;align-items:center;width:100%">
+        <div class="dl-s">${item.size} • 🌱${item.seeders}</div>
+        <a href="${item.torrent_url}" target="_blank" class="dl-go" style="text-decoration:none;margin-left:auto">⬇ Torrent</a>
+        ${item.magnet ? `<a href="${item.magnet}" class="dl-go" style="text-decoration:none;background:#6c25be">🧲</a>` : ''}
+      </div>
+    </div>`;
+  });
+
+  html += `</div><div class="dl-note">🧲 Torrent client chahiye download ke liye</div>`;
+  panel.innerHTML = html;
+}
+
+// ─── Legacy startDl (scraper nahi hai to fallback) ───
+function startDl(q, name, malId) {
+  toast(`⬇ "${name}" — ${q} dhoondh raha hai...`, 'success');
+  const params = new URLSearchParams({ anime: name, quality: q, malId: malId||0, json: 1 });
+  fetch('download.php?' + params.toString())
+    .then(r => r.json())
+    .then(data => {
+      if(data.redirect_url) {
+        toast(`🔗 ${data.source} pe redirect...`, 'info');
+        setTimeout(() => window.open(data.redirect_url, '_blank'), 600);
+      }
+    })
+    .catch(() => window.open(`https://nyaa.si/?q=${encodeURIComponent(name+' '+q)}&c=1_2`, '_blank'));
+}
+function addWish(id){ const a=DB.find(x=>x.id===id); toast(`❤️ "${a?.eng}" saved!`,'info'); }
+
+// ═══════════════════════════════
+// GENRE FILTER
+// ═══════════════════════════════
+document.getElementById('genreBar').addEventListener('click',e=>{
+  const pill=e.target.closest('.genre-pill');
+  if(!pill) return;
+  document.querySelectorAll('.genre-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  activeGenre=pill.dataset.g; page=0;
+  if(activeGenre==='all') filtered=[...DB];
+  else if(activeGenre==='MOVIE') filtered=DB.filter(a=>a.isMovie);
+  else filtered=DB.filter(a=>a.genres.includes(activeGenre));
+  renderPopular();renderNew();renderMovies();
+});
+
+// ═══════════════════════════════
+// SEARCH
+// ═══════════════════════════════
+let st;
+document.getElementById('searchInput').addEventListener('input',e=>{
+  clearTimeout(st);
+  st=setTimeout(()=>{
+    const q=e.target.value.trim().toLowerCase();
+    const ss=document.getElementById('searchSec');
+    if(!q){ss.style.display='none';return;}
+    const res=DB.filter(a=>a.eng.toLowerCase().includes(q)||a.genres.some(g=>g.toLowerCase().includes(q)));
+    document.getElementById('searchGrid').innerHTML=res.length?res.map(buildCard).join(''):'<p style="color:var(--muted);padding:1rem">Koi result nahi mila.</p>';
+    ss.style.display='block';ss.scrollIntoView({behavior:'smooth'});
+    setTimeout(observeCards,100);
+  },300);
+});
+
+document.getElementById('clearBtn').onclick=e=>{
+  e.preventDefault();
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchSec').style.display='none';
+};
+
+// LOAD MORE
+document.getElementById('loadBtn').onclick=()=>{page++;renderPopular();};
+
+// OVERLAY CLICK
+document.getElementById('overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('overlay')) closeModal();
+});
+
+// TOAST
+function toast(msg,type='info'){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+document.getElementById('statCount').textContent=DB.length+'+';
+renderTrending();
+renderPopular();
+renderNew();
+renderMovies();
+</script>
+</body>
+</html>
